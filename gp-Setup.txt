@@ -107,3 +107,33 @@ sudo systemctl status apache2
 sudo ufw allow 80,443,3335/tcp
 sudo ufw status
 sudo /etc/init.d/apache2 stop
+
+Now start SSL generation steps, do not close above browser tabs.
+sudo apt install letsencrypt -y
+systemctl status certbot.timer
+sudo certbot certonly --standalone --agree-tos --preferred-challenges http -d keeparsecurity.com --register-unsafely-without-email
+
+Successfully received certificate.
+Certificate is saved at: /etc/letsencrypt/live/-------/fullchain.pem
+Key is saved at:         /etc/letsencrypt/live/-----/privkey.pem
+This certificate expires on 2025-05-17.
+These files will be updated when the certificate renews.
+Certbot has set up a scheduled task to automatically renew this certificate in the background.
+
+
+Make sure to run these copy commands from root directory:
+
+cp /etc/letsencrypt/live/-------/fullchain.pem gophish/public.crt
+cp /etc/letsencrypt/live/--------/privkey.pem gophish/private.key
+
+
+------------------------------------
+NOW BUILD : It will build 
+------------------------------------
+npm install
+npx gulp build
+go build
+
+
+sudo ./gophish
+
