@@ -65,10 +65,10 @@ sed -i 's/const ServerName = "gophish"/const ServerName = "IGNORE"/' config/conf
 sed -i 's/const RecipientParameter = "rid"/const RecipientParameter = "keyname"/g' models/campaign.go
 
 # Copying in custom 404 handler
-COPY ./files/phish.go to ./controllers/phish.go
+cp ./files/phish.go ./controllers/phish.go
 File: https://github.com/nirajgautamit/SynackTools/blob/main/Tools/Gophish/sneaky_gophish-main/files/phish.go
 
-COPY ./files/404.html ./templates/
+cp ./files/404.html ./templates/
 File:
 https://github.com/nirajgautamit/SynackTools/blob/main/Tools/Gophish/sneaky_gophish-main/files/404.html
 
