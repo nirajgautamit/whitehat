@@ -1,0 +1,109 @@
+
+------------------------------------------------------------------
+Configure Gophish with Custom changes
+-------------------------------------------------------------------
+git clone https://github.com/gophish/gophish.git
+
+
+sudo apt-get update 
+sudo apt-get install nodejs
+sudo apt-get install npm
+
+# Verify installation
+nodejs -v
+npm -v
+
+sudo npm install --global gulp-cli
+# Verify installation
+gulp -v
+
+Install Go language:
+wget https://dl.google.com/go/go1.24.0.linux-amd64.tar.gz
+
+sudo tar -xvf go1.24.0.linux-amd64.tar.gz
+sudo mv go /usr/local
+
+# Setup Go Environment
+
+# Open the .bashrc file
+nano ~/.bashrc
+
+# Paste the following lines at the end of the file
+export GOROOT=/usr/local/go
+export GOPATH=$HOME/go
+export PATH=$GOPATH/bin:$GOROOT/bin:$PATH
+
+# Save and close the file
+
+# Load the variables into the current shell session
+source ~/.bashrc
+
+# Verify Installation
+go version
+
+----------------------------------------------------
+GOPHISH HARDENING - CHANGE DEFAULT SIGNATURES
+------------------------------------------------------
+Go to 'gophish folder'
+root@CampaignLab:~# cd gophish/
+root@CampaignLab:~/gophish# pwd
+/root/gophish
+
+# Stripping X-Gophish
+sed -i 's/X-Gophish-Contact/X-Contact/g' models/email_request_test.go
+sed -i 's/X-Gophish-Contact/X-Contact/g' models/maillog.go
+sed -i 's/X-Gophish-Contact/X-Contact/g' models/maillog_test.go
+sed -i 's/X-Gophish-Contact/X-Contact/g' models/email_request.go
+
+# Stripping X-Gophish-Signature
+sed -i 's/X-Gophish-Signature/X-Signature/g' webhook/webhook.go
+
+# Changing server name
+sed -i 's/const ServerName = "gophish"/const ServerName = "IGNORE"/' config/config.go
+
+# Changing rid value
+sed -i 's/const RecipientParameter = "rid"/const RecipientParameter = "keyname"/g' models/campaign.go
+
+# Copying in custom 404 handler
+COPY ./files/phish.go to ./controllers/phish.go
+File: https://github.com/nirajgautamit/SynackTools/blob/main/Tools/Gophish/sneaky_gophish-main/files/phish.go
+
+COPY ./files/404.html ./templates/
+File:
+https://github.com/nirajgautamit/SynackTools/blob/main/Tools/Gophish/sneaky_gophish-main/files/404.html
+
+# static > js > src > app > campaign_results.js
+    var ip = details.browser['address']
+    var ipString = '<div class="timeline-device-browser"><span class="fa fa-stack">' +
+        '<i class="fa fa-globe fa-stack-1x"></i></span> IP: ' +
+        ip + '</div>'
+    detailsString += ipString
+
+Or replace campaign_results.js code with our code in the repo.
+
+Code is from: https://github.com/gophish/gophish/issues/2137
+
+#make changes to config.json inside gophish folder:
+basically change certificate name, port  and use_tls to true:
+	"admin_server": {
+		"listen_url": "0.0.0.0:3335",
+		"use_tls": true,
+		"cert_path": "public.crt",
+		"key_path": "private.key"
+	},
+	"phish_server": {
+		"listen_url": "0.0.0.0:80",
+		"use_tls": true,
+		"cert_path": "public.crt",
+		"key_path": "private.key"
+
+---------------------------------------
+VPS configuration
+---------------------------------------
+sudo apt update && sudo apt upgrade -y
+sudo apt install apache2 -y
+sudo systemctl start apache2
+sudo systemctl status apache2
+sudo ufw allow 80,443,3335/tcp
+sudo ufw status
+sudo /etc/init.d/apache2 stop
